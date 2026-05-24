@@ -43,6 +43,33 @@ black watch women
 blue casual shirt
 ```
 
+## Qdrant
+
+For local vector database testing, run Qdrant with Docker:
+
+```bash
+docker pull qdrant/qdrant
+docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage qdrant/qdrant
+```
+
+Then upload the saved products and embeddings:
+
+```bash
+uv run python qdrant_upload.py
+```
+
+Search through Qdrant:
+
+```bash
+uv run python qdrant_search.py
+```
+
+By default, the upload script uses:
+
+```text
+http://localhost:6333
+```
+
 ## Notes
 
 - The current search uses `sentence-transformers/all-MiniLM-L6-v2` through Transformers.
