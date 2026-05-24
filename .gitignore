@@ -18,3 +18,4 @@ skills/
 
 # generated artifacts
 artifacts/*.pkl
+data/*.npy
