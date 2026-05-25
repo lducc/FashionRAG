@@ -5,6 +5,14 @@ A small fashion product search project using local embeddings and Qdrant.
 The dataset is `ashraq/fashion-product-images-small` from Hugging Face. Product text is embedded
 with `sentence-transformers/all-MiniLM-L6-v2`, then uploaded to a local Qdrant vector database.
 
+## Project Structure
+
+```text
+fashionrag/   # shared project code
+scripts/      # runnable commands
+data/         # generated products and embeddings
+```
+
 ## Setup
 
 Install dependencies:
@@ -15,7 +23,7 @@ uv sync
 
 ## 1. Build The Data Files
 
-Run ingestion:
+Run ingestion. This downloads the dataset, cleans product fields, and creates embeddings:
 
 ```bash
 uv run python -m scripts.ingest
@@ -45,7 +53,7 @@ http://localhost:6333/dashboard
 
 ## 3. Upload To Qdrant
 
-In another terminal, upload the local product data and embeddings:
+In another terminal, upload products and embeddings to Qdrant:
 
 ```bash
 uv run python -m scripts.qdrant_upload
@@ -59,7 +67,7 @@ fashion_products
 
 ## 4. Search Qdrant
 
-Run:
+Run semantic search through Qdrant:
 
 ```bash
 uv run python -m scripts.qdrant_search
@@ -75,13 +83,11 @@ blue casual shirt
 
 ## Local Search
 
-There is also a local NumPy search script:
+There is also a local NumPy search script. This does not use Qdrant:
 
 ```bash
 uv run python -m scripts.local_search
 ```
-
-This searches `data/minilm_text_embeddings.npy` directly instead of Qdrant.
 
 ## Notes
 
