@@ -87,6 +87,14 @@ black watch women
 blue casual shirt
 ```
 
+## App
+
+Run the simple Gradio app:
+
+```bash
+uv run python -m scripts.app
+```
+
 ## Local Search
 
 There is also a local NumPy search script. This does not use Qdrant:

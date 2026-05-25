@@ -2,12 +2,26 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import wordpunct_tokenize
 from rank_bm25 import BM25Okapi
-import nltk
 from fashionrag.products import load_products
 
-nltk.download('stopwords')
 stemmer = PorterStemmer()
 stop_words = set(stopwords.words("english"))
+#Caching bm25 + products
+bm25, products = None, None
+
+def load_keyword_index():
+    global bm25, products
+
+    if bm25 is None or products is None:
+        products = load_products()
+        tokenized_products = []
+
+        for product in products:
+            tokenized_products.append(tokenize(product["search_text"]))
+
+        bm25 = BM25Okapi(tokenized_products)
+
+    return products, bm25
 
 def tokenize(text):
     words = wordpunct_tokenize(text.lower())
@@ -20,6 +34,8 @@ def tokenize(text):
         word = stemmer.stem(word)
         tokens.append(word)
 
+        #specific case for t-shirts?
+        #TASK: add metadata in the dataset for other clothings as well
         if word == "shirt":
             tokens.append("tshirt")
         elif word == "tshirt":
@@ -32,13 +48,7 @@ def tokenize(text):
 
 
 def keyword_search(query, limit=30):
-    products = load_products()
-    tokenized_products = []
-
-    for product in products:
-        tokenized_products.append(tokenize(product["search_text"]))
-
-    bm25 = BM25Okapi(tokenized_products)
+    products, bm25 = load_keyword_index()
     query_words = tokenize(query)
     scores = bm25.get_scores(query_words)
     ranked_indexes = scores.argsort()[::-1]
@@ -48,12 +58,16 @@ def keyword_search(query, limit=30):
 
     for index in ranked_indexes:
         product = products[index]
+        score = float(scores[index])
+
+        if score <= 0:
+            break
 
         if product["name"] in seen_names:
             continue
 
         seen_names.append(product["name"])
-        product["score"] = round(float(scores[index]), 3)
+        product["score"] = round(score, 3)
         results.append(product)
 
         if len(results) == limit:

@@ -14,12 +14,20 @@ def hybrid_search(query, limit=7):
 
     for rank, product in enumerate(semantic_results):
         product_id = product["id"]
+
+        if product["score"] <= 0:
+            continue
+
         final_scores[product_id] = final_scores.get(product_id, 0) + 1 / (k + rank + 1)
         semantic_scores[product_id] = product["score"]
         products[product_id] = product
 
     for rank, product in enumerate(keyword_results):
         product_id = product["id"]
+
+        if product["score"] <= 0:
+            continue
+
         final_scores[product_id] = final_scores.get(product_id, 0) + 1 / (k + rank + 1)
         keyword_scores[product_id] = product["score"]
         products[product_id] = product

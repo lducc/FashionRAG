@@ -1,20 +1,23 @@
 import numpy as np
 import torch
-
+import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import AutoModel, AutoTokenizer
 from tqdm import tqdm
-
 from fashionrag.settings import BATCH_SIZE, MODEL_NAME
 
-
+tokenizer, model, device = None, None, None
 def load_model():
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    global tokenizer, model, device
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModel.from_pretrained(MODEL_NAME)
-    model.eval()
-    model.to(device)
+    if tokenizer is None or model is None:
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+        model = AutoModel.from_pretrained(MODEL_NAME)
+        model.to(device)
+
+        model.eval()
 
     return tokenizer, model, device
 
