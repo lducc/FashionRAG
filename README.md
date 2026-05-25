@@ -18,7 +18,7 @@ uv sync
 Run ingestion:
 
 ```bash
-uv run python ingest.py
+uv run python -m scripts.ingest
 ```
 
 This creates:
@@ -48,7 +48,7 @@ http://localhost:6333/dashboard
 In another terminal, upload the local product data and embeddings:
 
 ```bash
-uv run python qdrant_upload.py
+uv run python -m scripts.qdrant_upload
 ```
 
 This creates or reuses a collection named:
@@ -62,7 +62,7 @@ fashion_products
 Run:
 
 ```bash
-uv run python qdrant_search.py
+uv run python -m scripts.qdrant_search
 ```
 
 Try queries like:
@@ -78,7 +78,7 @@ blue casual shirt
 There is also a local NumPy search script:
 
 ```bash
-uv run python main.py
+uv run python -m scripts.local_search
 ```
 
 This searches `data/minilm_text_embeddings.npy` directly instead of Qdrant.
