@@ -21,12 +21,26 @@ Install dependencies:
 uv sync
 ```
 
+Optional Hugging Face token setup:
+
+```bash
+cp .env.example .env
+```
+
+Then add your token in `.env`:
+
+```text
+HF_TOKEN=hf_your_token_here
+```
+
+Use `--env-file .env` when running commands that download models or datasets.
+
 ## 1. Build The Data Files
 
 Run ingestion. This downloads the dataset, cleans product fields, and creates embeddings:
 
 ```bash
-uv run python -m scripts.ingest
+uv run --env-file .env python -m scripts.ingest
 ```
 
 This creates:
@@ -56,7 +70,7 @@ http://localhost:6333/dashboard
 In another terminal, upload products and embeddings to Qdrant:
 
 ```bash
-uv run python -m scripts.qdrant_upload
+uv run --env-file .env python -m scripts.qdrant_upload
 ```
 
 This creates or reuses a collection named:
@@ -70,13 +84,13 @@ fashion_products
 Run semantic search through Qdrant:
 
 ```bash
-uv run python -m scripts.qdrant_search
+uv run --env-file .env python -m scripts.qdrant_search
 ```
 
 Run hybrid keyword + semantic search:
 
 ```bash
-uv run python -m scripts.hybrid_search
+uv run --env-file .env python -m scripts.hybrid_search
 ```
 
 Try queries like:
@@ -92,7 +106,7 @@ blue casual shirt
 Run the simple Gradio app:
 
 ```bash
-uv run python -m scripts.app
+uv run --env-file .env python -m scripts.app
 ```
 
 ## Local Search
@@ -100,13 +114,13 @@ uv run python -m scripts.app
 There is also a local NumPy search script. This does not use Qdrant:
 
 ```bash
-uv run python -m scripts.local_search
+uv run --env-file .env python -m scripts.local_search
 ```
 
 And a keyword-only BM25 script:
 
 ```bash
-uv run python -m scripts.keyword_search
+uv run --env-file .env python -m scripts.keyword_search
 ```
 
 ## Notes
