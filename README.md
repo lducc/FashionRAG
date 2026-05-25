@@ -73,6 +73,12 @@ Run semantic search through Qdrant:
 uv run python -m scripts.qdrant_search
 ```
 
+Run hybrid keyword + semantic search:
+
+```bash
+uv run python -m scripts.hybrid_search
+```
+
 Try queries like:
 
 ```text
@@ -89,9 +95,17 @@ There is also a local NumPy search script. This does not use Qdrant:
 uv run python -m scripts.local_search
 ```
 
+And a keyword-only BM25 script:
+
+```bash
+uv run python -m scripts.keyword_search
+```
+
 ## Notes
 
 - Qdrant runs locally at `http://localhost:6333`.
 - The vector size is `384` because MiniLM returns 384-dimensional embeddings.
+- Hybrid search combines Qdrant semantic search with BM25 keyword search.
+- BM25 uses NLTK tokenization and stemming.
 - `qdrant_storage/` is local database storage and should not be committed.
 - `torchvision` is not needed for this version.
