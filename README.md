@@ -48,6 +48,7 @@ This creates:
 ```text
 data/products_sample.jsonl
 data/minilm_text_embeddings.npy
+artifacts/bm25_vectorizer.pkl
 ```
 
 ## 2. Start Qdrant Locally
@@ -129,5 +130,6 @@ uv run --env-file .env python -m scripts.keyword_search
 - The vector size is `384` because MiniLM returns 384-dimensional embeddings.
 - Hybrid search combines Qdrant semantic search with BM25 keyword search.
 - BM25 uses NLTK tokenization and stemming.
+- The BM25 index is built during ingestion and loaded during search.
 - `qdrant_storage/` is local database storage and should not be committed.
 - `torchvision` is not needed for this version.

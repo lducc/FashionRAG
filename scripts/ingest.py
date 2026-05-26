@@ -4,8 +4,9 @@ from datasets import load_dataset
 from tqdm import tqdm
 
 from fashionrag.embeddings import embed_texts
+from fashionrag.keyword import save_keyword_index
 from fashionrag.products import build_product, save_products
-from fashionrag.settings import DATASET_NAME, EMBEDDINGS_FILE, PRODUCTS_FILE
+from fashionrag.settings import BM25_FILE, DATASET_NAME, EMBEDDINGS_FILE, PRODUCTS_FILE
 
 
 products = []
@@ -17,6 +18,9 @@ for row in tqdm(dataset, desc="Collecting data"):
 
 save_products(products, PRODUCTS_FILE)
 print(f"Saved {len(products)} products to {PRODUCTS_FILE}")
+
+save_keyword_index(products, BM25_FILE)
+print(f"Saved BM25 index to {BM25_FILE}")
 
 text_list = []
 

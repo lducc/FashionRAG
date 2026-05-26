@@ -3,8 +3,6 @@ import numpy as np
 from fashionrag.embeddings import embed_texts
 from fashionrag.products import load_products
 from fashionrag.settings import EMBEDDINGS_FILE
-
-
 def local_search(query, limit=7):
     products = load_products()
     product_vectors = np.load(EMBEDDINGS_FILE)
