@@ -94,6 +94,12 @@ Run hybrid keyword + semantic search:
 uv run --env-file .env python -m scripts.hybrid_search
 ```
 
+Run the retrieval eval:
+
+```bash
+uv run --env-file .env python -m eval.ablation
+```
+
 Try queries like:
 
 ```text
@@ -131,5 +137,6 @@ uv run --env-file .env python -m scripts.keyword_search
 - Hybrid search combines Qdrant semantic search with BM25 keyword search.
 - BM25 uses NLTK tokenization and stemming.
 - The BM25 index is built during ingestion and loaded during search.
+- The eval compares semantic-only retrieval against hybrid retrieval with Recall@5 and MRR.
 - `qdrant_storage/` is local database storage and should not be committed.
 - `torchvision` is not needed for this version.

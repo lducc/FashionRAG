@@ -1,0 +1,82 @@
+[
+  {
+    "query": "red striped shirt men",
+    "relevant_ids": ["9452", "9455", "9261", "16332", "9250"]
+  },
+  {
+    "query": "girls red dress",
+    "relevant_ids": ["29167", "37267"]
+  },
+  {
+    "query": "brown shoes men",
+    "relevant_ids": ["10633", "39943", "19329", "45604", "40971"]
+  },
+  {
+    "query": "black watch women",
+    "relevant_ids": ["45294", "47992", "43155", "36757", "45205"]
+  },
+  {
+    "query": "blue jeans men",
+    "relevant_ids": ["39386", "16508", "11349", "11340", "11347"]
+  },
+  {
+    "query": "pink lipstick women",
+    "relevant_ids": ["57597", "55438", "55436", "57562", "56018"]
+  },
+  {
+    "query": "white casual shoes women",
+    "relevant_ids": ["3505", "6672", "12702", "5897", "9116"]
+  },
+  {
+    "query": "green saree women",
+    "relevant_ids": ["59638", "51091", "59653", "59639", "57956"]
+  },
+  {
+    "query": "yellow dress girls",
+    "relevant_ids": ["27196"]
+  },
+  {
+    "query": "blue t shirt men",
+    "relevant_ids": ["14293", "44341", "7503", "32769", "1852"]
+  },
+  {
+    "query": "black formal shoes men",
+    "relevant_ids": ["9036", "10268", "59435", "23247", "45603"]
+  },
+  {
+    "query": "silver watch women",
+    "relevant_ids": ["59263", "39375", "44983", "37488", "58942"]
+  },
+  {
+    "query": "red handbag women",
+    "relevant_ids": ["25175", "21526", "37428", "37419", "10203"]
+  },
+  {
+    "query": "men blue casual shirt",
+    "relevant_ids": ["22395", "12190", "13846", "22359", "11712"]
+  },
+  {
+    "query": "women brown sandals",
+    "relevant_ids": ["33697"]
+  },
+  {
+    "query": "boys blue t shirt",
+    "relevant_ids": ["8322", "10054", "4727", "38493", "37623"]
+  },
+  {
+    "query": "women black heels",
+    "relevant_ids": ["54118", "54127", "14431", "34455", "20267"]
+  },
+  {
+    "query": "men white sneakers",
+    "relevant_ids": ["39988", "19311", "24250", "22705", "30233"]
+  },
+  {
+    "query": "orange kurta women",
+    "relevant_ids": ["21915", "46017", "21912", "18290", "42429"]
+  },
+  {
+    "query": "purple top women",
+    "relevant_ids": ["10401", "19578", "42241", "2483", "21111"]
+  }
+]
