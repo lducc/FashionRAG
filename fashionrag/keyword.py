@@ -8,8 +8,18 @@ from fashionrag.products import load_products
 from fashionrag.settings import BM25_FILE
 
 stemmer = PorterStemmer()
-stop_words = set(stopwords.words("english"))
-#Caching bm25 + products
+try:
+    stop_words = set(stopwords.words("english"))
+except LookupError:
+    stop_words = {"a", "an", "and", "for", "of", "the", "with"}
+
+ALIASES = {
+    "shirt": ["tshirt"],
+    "tshirt": ["t", "shirt"],
+    "tee": ["tshirt"],
+}
+
+# Cache BM25 and products while the app is running.
 bm25, products = None, None
 
 def build_keyword_index(product_list):
@@ -30,6 +40,7 @@ def save_keyword_index(product_list, path=BM25_FILE):
 
     return keyword_index
 
+
 def load_keyword_index():
     global bm25, products
 
@@ -45,6 +56,7 @@ def load_keyword_index():
 
     return products, bm25
 
+
 def tokenize(text):
     words = wordpunct_tokenize(text.lower())
     tokens = []
@@ -55,16 +67,7 @@ def tokenize(text):
 
         word = stemmer.stem(word)
         tokens.append(word)
-
-        #specific case for t-shirts?
-        #TASK: add metadata in the dataset for other clothings as well
-        if word == "shirt":
-            tokens.append("tshirt")
-        elif word == "tshirt":
-            tokens.append("t")
-            tokens.append("shirt")
-        elif word == "tee":
-            tokens.append("tshirt")
+        tokens.extend(ALIASES.get(word, []))
 
     return tokens
 

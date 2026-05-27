@@ -91,16 +91,19 @@ text: product text vectors from MiniLM
 
 ## 4. Search Qdrant
 
-Run semantic search through Qdrant:
+Run search from one interactive script:
 
 ```bash
-uv run --env-file .env python -m scripts.qdrant_search
+uv run --env-file .env python -m scripts.search
 ```
 
-Run hybrid keyword + semantic search:
+Choose a mode when prompted:
 
-```bash
-uv run --env-file .env python -m scripts.hybrid_search
+```text
+hybrid
+semantic
+keyword
+local
 ```
 
 Run the retrieval eval:
@@ -125,18 +128,12 @@ Run the simple Gradio app:
 uv run --env-file .env python -m scripts.app
 ```
 
-## Local Search
+## Tests
 
-There is also a local NumPy search script. This does not use Qdrant:
-
-```bash
-uv run --env-file .env python -m scripts.local_search
-```
-
-And a keyword-only BM25 script:
+Run the test suite:
 
 ```bash
-uv run --env-file .env python -m scripts.keyword_search
+uv run pytest
 ```
 
 ## Notes

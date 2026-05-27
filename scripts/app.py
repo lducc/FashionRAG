@@ -1,12 +1,12 @@
 import gradio as gr
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 from fashionrag.clip import load_clip_model
 from fashionrag.hybrid import hybrid_search
 
 load_dotenv()
+
+
 def search(query):
     if not query.strip():
         return None
@@ -27,6 +27,7 @@ def search(query):
             }
         )
     return pd.DataFrame(rows)
+
 
 load_clip_model()
 

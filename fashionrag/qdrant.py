@@ -17,9 +17,29 @@ from fashionrag.settings import (
     VECTOR_SIZE,
 )
 
+UPLOAD_BATCH_SIZE = 100
+
 
 def get_client():
     return QdrantClient(url=QDRANT_URL)
+
+
+def vector_config():
+    return {
+        CLIP_VECTOR_NAME: VectorParams(size=CLIP_VECTOR_SIZE, distance=Distance.COSINE),
+        TEXT_VECTOR_NAME: VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
+    }
+
+
+def build_point(product, text_vector, clip_vector):
+    return PointStruct(
+        id=int(product["id"]),
+        vector={
+            CLIP_VECTOR_NAME: clip_vector.tolist(),
+            TEXT_VECTOR_NAME: text_vector.tolist(),
+        },
+        payload=product,
+    )
 
 
 def upload_products():
@@ -36,29 +56,16 @@ def upload_products():
 
     client.create_collection(
         collection_name=QDRANT_COLLECTION,
-        vectors_config={
-            CLIP_VECTOR_NAME: VectorParams(size=CLIP_VECTOR_SIZE, distance=Distance.COSINE),
-            TEXT_VECTOR_NAME: VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
-        },
+        vectors_config=vector_config(),
     )
 
     points = []
 
     for index, product in tqdm(list(enumerate(products)), desc="prepping points"):
-        point = PointStruct(
-            id=int(product["id"]),
-            vector={
-                CLIP_VECTOR_NAME: clip_vectors[index].tolist(),
-                TEXT_VECTOR_NAME: text_vectors[index].tolist(),
-            },
-            payload=product,
-        )
-        points.append(point)
+        points.append(build_point(product, text_vectors[index], clip_vectors[index]))
 
-    batch_size = 100
-
-    for i in tqdm(range(0, len(points), batch_size), desc="uploading to qdrant"):
-        batch = points[i:i + batch_size]
+    for i in tqdm(range(0, len(points), UPLOAD_BATCH_SIZE), desc="uploading to qdrant"):
+        batch = points[i:i + UPLOAD_BATCH_SIZE]
         client.upsert(collection_name=QDRANT_COLLECTION, points=batch)
 
     client.close()
