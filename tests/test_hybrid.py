@@ -36,3 +36,53 @@ def test_hybrid_search_keeps_both_scores_for_same_product(monkeypatch):
     assert results[0]["semantic_score"] == 0.8
     assert results[0]["keyword_score"] == 5.0
     assert results[0]["final_score"] == 0.0328
+
+
+def test_hybrid_search_applies_metadata_filters(monkeypatch):
+    semantic_results = [
+        {
+            "id": "1",
+            "name": "wrong gender",
+            "score": 0.9,
+            "gender": "Men",
+            "article_type": "Dresses",
+            "color": "Black",
+        },
+        {
+            "id": "2",
+            "name": "right product",
+            "score": 0.8,
+            "gender": "Women",
+            "article_type": "Dresses",
+            "color": "Black",
+        },
+    ]
+    keyword_results = []
+
+    monkeypatch.setattr(hybrid, "search_qdrant", lambda query, limit=50: semantic_results)
+    monkeypatch.setattr(hybrid, "keyword_search", lambda query, limit=50: keyword_results)
+
+    results = hybrid.hybrid_search("women black dress", limit=7)
+
+    assert [product["id"] for product in results] == ["2"]
+
+
+def test_hybrid_search_falls_back_when_filters_remove_everything(monkeypatch):
+    semantic_results = [
+        {
+            "id": "1",
+            "name": "best fallback",
+            "score": 0.9,
+            "gender": "Men",
+            "article_type": "Shirts",
+            "color": "Red",
+        }
+    ]
+    keyword_results = []
+
+    monkeypatch.setattr(hybrid, "search_qdrant", lambda query, limit=50: semantic_results)
+    monkeypatch.setattr(hybrid, "keyword_search", lambda query, limit=50: keyword_results)
+
+    results = hybrid.hybrid_search("women black dress", limit=7)
+
+    assert [product["id"] for product in results] == ["1"]

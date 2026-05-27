@@ -10,11 +10,8 @@ from fashionrag.settings import (
     CLIP_EMBEDDINGS_FILE,
     CLIP_VECTOR_NAME,
     CLIP_VECTOR_SIZE,
-    EMBEDDINGS_FILE,
     QDRANT_COLLECTION,
     QDRANT_URL,
-    TEXT_VECTOR_NAME,
-    VECTOR_SIZE,
 )
 
 UPLOAD_BATCH_SIZE = 100
@@ -27,16 +24,14 @@ def get_client():
 def vector_config():
     return {
         CLIP_VECTOR_NAME: VectorParams(size=CLIP_VECTOR_SIZE, distance=Distance.COSINE),
-        TEXT_VECTOR_NAME: VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE),
     }
 
 
-def build_point(product, text_vector, clip_vector):
+def build_point(product, clip_vector):
     return PointStruct(
         id=int(product["id"]),
         vector={
             CLIP_VECTOR_NAME: clip_vector.tolist(),
-            TEXT_VECTOR_NAME: text_vector.tolist(),
         },
         payload=product,
     )
@@ -44,11 +39,10 @@ def build_point(product, text_vector, clip_vector):
 
 def upload_products():
     products = load_products()
-    text_vectors = np.load(EMBEDDINGS_FILE)
     clip_vectors = np.load(CLIP_EMBEDDINGS_FILE)
     client = get_client()
 
-    if len(products) != len(text_vectors) or len(products) != len(clip_vectors):
+    if len(products) != len(clip_vectors):
         raise ValueError("Products and embeddings have different lengths.")
 
     if client.collection_exists(collection_name=QDRANT_COLLECTION):
@@ -62,7 +56,7 @@ def upload_products():
     points = []
 
     for index, product in tqdm(list(enumerate(products)), desc="prepping points"):
-        points.append(build_point(product, text_vectors[index], clip_vectors[index]))
+        points.append(build_point(product, clip_vectors[index]))
 
     for i in tqdm(range(0, len(points), UPLOAD_BATCH_SIZE), desc="uploading to qdrant"):
         batch = points[i:i + UPLOAD_BATCH_SIZE]

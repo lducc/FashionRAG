@@ -1,14 +1,12 @@
 from fashionrag.hybrid import hybrid_search
 from fashionrag.keyword import keyword_search
 from fashionrag.qdrant import search_qdrant
-from fashionrag.search import local_search
 
 
 SEARCH_MODES = {
     "hybrid": hybrid_search,
     "semantic": search_qdrant,
     "keyword": keyword_search,
-    "local": local_search,
 }
 
 
@@ -23,7 +21,7 @@ def print_result(product, mode):
 
 
 def main():
-    print("Modes: hybrid, semantic, keyword, local")
+    print("Modes: hybrid, semantic, keyword")
     mode = input("Choose mode: ").strip().lower()
 
     if mode not in SEARCH_MODES:

@@ -1,10 +1,10 @@
 # FashionRAG
 
-A small fashion product search project using local embeddings and Qdrant.
+A small fashion product search project using CLIP image embeddings, BM25, and Qdrant.
 
 The dataset is `ashraq/fashion-product-images-small` from Hugging Face. Product images are embedded
-with CLIP, product text is embedded with MiniLM, then both vectors are uploaded to a local Qdrant
-vector database.
+with CLIP, then uploaded to a local Qdrant vector database. Product metadata is also indexed with
+BM25 for keyword search.
 
 ## Project Structure
 
@@ -48,7 +48,6 @@ This creates:
 
 ```text
 data/products_sample.jsonl
-data/minilm_text_embeddings.npy
 data/clip_image_embeddings.npy
 artifacts/bm25_vectorizer.pkl
 ```
@@ -82,11 +81,10 @@ This recreates the local collection named:
 fashion_products
 ```
 
-The upload recreates this local collection with two named vectors:
+The upload recreates this local collection with one named vector:
 
 ```text
 clip: image vectors from CLIP
-text: product text vectors from MiniLM
 ```
 
 ## 4. Search Qdrant
@@ -103,7 +101,6 @@ Choose a mode when prompted:
 hybrid
 semantic
 keyword
-local
 ```
 
 Run the retrieval eval:
@@ -139,9 +136,10 @@ uv run pytest
 ## Notes
 
 - Qdrant runs locally at `http://localhost:6333`.
-- Qdrant stores `clip` vectors with 512 dimensions and `text` vectors with 384 dimensions.
+- Qdrant stores `clip` vectors with 512 dimensions.
 - Hybrid search combines Qdrant semantic search with BM25 keyword search.
 - Semantic Qdrant search uses CLIP text queries against CLIP image vectors.
+- Simple metadata filters help enforce obvious query terms like gender, color, and article type.
 - BM25 uses NLTK tokenization and stemming.
 - The BM25 index is built during ingestion and loaded during search.
 - The eval compares semantic-only retrieval against hybrid retrieval with Recall@5 and MRR.
