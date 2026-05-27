@@ -1,7 +1,5 @@
 import json
-
 from fashionrag.settings import PRODUCTS_FILE
-
 
 def build_product(row):
     product = {

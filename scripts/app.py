@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
-from fashionrag.embeddings import load_model
+from fashionrag.clip import load_clip_model
 from fashionrag.hybrid import hybrid_search
 
 load_dotenv()
@@ -28,7 +28,7 @@ def search(query):
         )
     return pd.DataFrame(rows)
 
-load_model()
+load_clip_model()
 
 demo = gr.Interface(
     fn = search,

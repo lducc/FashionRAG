@@ -2,8 +2,9 @@
 
 A small fashion product search project using local embeddings and Qdrant.
 
-The dataset is `ashraq/fashion-product-images-small` from Hugging Face. Product text is embedded
-with `sentence-transformers/all-MiniLM-L6-v2`, then uploaded to a local Qdrant vector database.
+The dataset is `ashraq/fashion-product-images-small` from Hugging Face. Product images are embedded
+with CLIP, product text is embedded with MiniLM, then both vectors are uploaded to a local Qdrant
+vector database.
 
 ## Project Structure
 
@@ -48,6 +49,7 @@ This creates:
 ```text
 data/products_sample.jsonl
 data/minilm_text_embeddings.npy
+data/clip_image_embeddings.npy
 artifacts/bm25_vectorizer.pkl
 ```
 
@@ -74,10 +76,17 @@ In another terminal, upload products and embeddings to Qdrant:
 uv run --env-file .env python -m scripts.qdrant_upload
 ```
 
-This creates or reuses a collection named:
+This recreates the local collection named:
 
 ```text
 fashion_products
+```
+
+The upload recreates this local collection with two named vectors:
+
+```text
+clip: image vectors from CLIP
+text: product text vectors from MiniLM
 ```
 
 ## 4. Search Qdrant
@@ -133,8 +142,9 @@ uv run --env-file .env python -m scripts.keyword_search
 ## Notes
 
 - Qdrant runs locally at `http://localhost:6333`.
-- The vector size is `384` because MiniLM returns 384-dimensional embeddings.
+- Qdrant stores `clip` vectors with 512 dimensions and `text` vectors with 384 dimensions.
 - Hybrid search combines Qdrant semantic search with BM25 keyword search.
+- Semantic Qdrant search uses CLIP text queries against CLIP image vectors.
 - BM25 uses NLTK tokenization and stemming.
 - The BM25 index is built during ingestion and loaded during search.
 - The eval compares semantic-only retrieval against hybrid retrieval with Recall@5 and MRR.

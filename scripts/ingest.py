@@ -3,10 +3,17 @@ import numpy as np
 from datasets import load_dataset
 from tqdm import tqdm
 
+from fashionrag.clip import embed_images
 from fashionrag.embeddings import embed_texts
 from fashionrag.keyword import save_keyword_index
 from fashionrag.products import build_product, save_products
-from fashionrag.settings import BM25_FILE, DATASET_NAME, EMBEDDINGS_FILE, PRODUCTS_FILE
+from fashionrag.settings import (
+    BM25_FILE,
+    CLIP_EMBEDDINGS_FILE,
+    DATASET_NAME,
+    EMBEDDINGS_FILE,
+    PRODUCTS_FILE,
+)
 
 
 products = []
@@ -31,3 +38,14 @@ product_vectors = embed_texts(text_list)
 np.save(EMBEDDINGS_FILE, product_vectors)
 
 print(f"Saved embeddings to {EMBEDDINGS_FILE}")
+
+
+def image_list():
+    for row in dataset:
+        yield row["image"]
+
+
+clip_vectors = embed_images(image_list(), total=len(dataset))
+np.save(CLIP_EMBEDDINGS_FILE, clip_vectors)
+
+print(f"Saved CLIP image embeddings to {CLIP_EMBEDDINGS_FILE}")
