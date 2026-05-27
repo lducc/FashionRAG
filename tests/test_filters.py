@@ -1,4 +1,5 @@
-from fashionrag.filters import extract_filters, filter_products
+from fashionrag import filters as filters_module
+from fashionrag.filters import build_metadata_index, extract_filters, filter_products
 
 
 def test_extract_filters_finds_basic_metadata():
@@ -55,3 +56,23 @@ def test_filter_products_keeps_shirts_and_tshirts_separate():
 
     assert shirt_results == [products[0]]
     assert tshirt_results == [products[1]]
+
+
+def test_extract_filters_uses_metadata_values(monkeypatch):
+    products = [
+        {
+            "gender": "Women",
+            "article_type": "Kurta Sets",
+            "color": "Mustard",
+            "usage": "Ethnic",
+            "season": "Fall",
+        }
+    ]
+
+    monkeypatch.setattr(filters_module, "metadata_index", build_metadata_index(products))
+
+    assert extract_filters("women mustard kurta set") == {
+        "gender": "Women",
+        "article_type": "Kurta Sets",
+        "color": "Mustard",
+    }

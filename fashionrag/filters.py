@@ -1,83 +1,27 @@
 from nltk.tokenize import wordpunct_tokenize
 
+from fashionrag.products import load_products
 
-GENDER_WORDS = {
-    "man": "Men",
-    "men": "Men",
-    "male": "Men",
-    "woman": "Women",
-    "women": "Women",
-    "female": "Women",
-    "lady": "Women",
-    "ladies": "Women",
-    "boy": "Boys",
-    "boys": "Boys",
-    "girl": "Girls",
-    "girls": "Girls",
-    "unisex": "Unisex",
-}
 
-ARTICLE_WORDS = {
-    "dress": "Dresses",
-    "dresses": "Dresses",
-    "jean": "Jeans",
-    "jeans": "Jeans",
-    "kurta": "Kurtas",
-    "saree": "Sarees",
-    "sari": "Sarees",
-    "top": "Tops",
-    "tops": "Tops",
-    "watch": "Watches",
-    "watches": "Watches",
-    "heel": "Heels",
-    "heels": "Heels",
-    "sandal": "Sandals",
-    "sandals": "Sandals",
-    "lipstick": "Lipstick",
-    "handbag": "Handbags",
-    "bag": "Bags",
-    "bags": "Bags",
-    "shoe": "Shoes",
-    "shoes": "Shoes",
-    "sneaker": "Shoes",
-    "sneakers": "Shoes",
-}
-
-COLOR_WORDS = {
-    "black": "Black",
-    "blue": "Blue",
-    "brown": "Brown",
-    "green": "Green",
-    "grey": "Grey",
-    "gray": "Grey",
-    "maroon": "Maroon",
-    "navy": "Navy Blue",
-    "orange": "Orange",
-    "pink": "Pink",
-    "purple": "Purple",
-    "red": "Red",
-    "silver": "Silver",
-    "white": "White",
-    "yellow": "Yellow",
-}
-
-USAGE_WORDS = {
-    "casual": "Casual",
-    "formal": "Formal",
-    "party": "Party",
-    "sports": "Sports",
-    "sport": "Sports",
-    "travel": "Travel",
-}
-
-SEASON_WORDS = {
-    "fall": "Fall",
-    "spring": "Spring",
-    "summer": "Summer",
-    "winter": "Winter",
-}
-
+FILTER_FIELDS = ["gender", "article_type", "color", "usage", "season"]
 EXACT_ARTICLE_TYPES = {"shirts", "tshirts"}
+WORD_ALIASES = {
+    "man": "men",
+    "male": "men",
+    "woman": "women",
+    "female": "women",
+    "lady": "women",
+    "ladies": "women",
+    "boy": "boys",
+    "girl": "girls",
+    "grey": "gray",
+    "tee": "tshirt",
+    "tees": "tshirt",
+    "sari": "saree",
+    "sneaker": "shoe",
+    "sneakers": "shoe",
+}
+metadata_index = None
 
 
 def query_words(query):
@@ -90,8 +34,42 @@ def query_words(query):
     return words
 
 
+def normalize_word(word):
+    word = WORD_ALIASES.get(word.lower(), word.lower())
+
+    if word == "shoes":
+        return "shoe"
+
+    if word.endswith("ies") and len(word) > 3:
+        return word[:-3] + "y"
+
+    if word.endswith("sses") and len(word) > 4:
+        return word[:-2]
+
+    if word.endswith("ss"):
+        return word
+
+    if word.endswith("es") and len(word) > 3:
+        return word[:-2]
+
+    if word.endswith("s") and len(word) > 3:
+        return word[:-1]
+
+    return word
+
+
+def normalize_text(text):
+    words = []
+
+    for word in wordpunct_tokenize(str(text).lower()):
+        if word.isalnum():
+            words.append(normalize_word(word))
+
+    return words
+
+
 def has_tshirt(words):
-    if "tshirt" in words or "tee" in words or "tees" in words:
+    if "tshirt" in words:
         return True
 
     for index, word in enumerate(words[:-1]):
@@ -101,40 +79,67 @@ def has_tshirt(words):
     return False
 
 
-def extract_filters(query):
-    words = query_words(query)
+def build_metadata_index(products):
+    index = {}
+
+    for field in FILTER_FIELDS:
+        index[field] = []
+        seen_values = set()
+
+        for product in products:
+            value = product[field]
+
+            if value in seen_values:
+                continue
+
+            seen_values.add(value)
+            index[field].append(
+                {
+                    "value": value,
+                    "tokens": set(normalize_text(value)),
+                }
+            )
+
+    return index
+
+
+def load_metadata_index():
+    global metadata_index
+
+    if metadata_index is None:
+        metadata_index = build_metadata_index(load_products())
+
+    return metadata_index
+
+
+def find_filter_value(words, field, index):
     word_set = set(words)
+    best_value = None
+    best_size = 0
+
+    for row in index[field]:
+        tokens = row["tokens"]
+
+        if tokens and tokens.issubset(word_set) and len(tokens) > best_size:
+            best_value = row["value"]
+            best_size = len(tokens)
+
+    return best_value
+
+
+def extract_filters(query):
+    words = [normalize_word(word) for word in query_words(query)]
+    index = load_metadata_index()
     filters = {}
 
-    for word, gender in GENDER_WORDS.items():
-        if word in word_set:
-            filters["gender"] = gender
-            break
+    for field in FILTER_FIELDS:
+        value = find_filter_value(words, field, index)
+
+        if value:
+            filters[field] = value
 
     if has_tshirt(words):
         filters["article_type"] = "Tshirts"
-    elif "shirt" in word_set or "shirts" in word_set:
-        filters["article_type"] = "Shirts"
-    else:
-        for word, article_type in ARTICLE_WORDS.items():
-            if word in word_set:
-                filters["article_type"] = article_type
-                break
-
-    for word, color in COLOR_WORDS.items():
-        if word in word_set:
-            filters["color"] = color
-            break
-
-    for word, usage in USAGE_WORDS.items():
-        if word in word_set:
-            filters["usage"] = usage
-            break
-
-    for word, season in SEASON_WORDS.items():
-        if word in word_set:
-            filters["season"] = season
-            break
 
     return filters
 
